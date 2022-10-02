@@ -1,0 +1,233 @@
+1091 資料與檔案結構 – 個人程式作業繳交注意事項
+
+．繳交內容：中序轉後序程式
+．JAVA繳交規定 :
+	1.請將整個專案匯出為Zip檔並附上程式執行檔(jar)
+	2.匯出檔案名稱: 資結程式作業_學號_名字.zip、資結程式作業_學號_名字.jar
+	3.主程式名稱: Main.java，檔案內註明jdk版本
+	4.請適當縮排，以利可讀性
+	5.當中若有引用任何套件，請放入專案中
+
+．繳交方式：於LMS繳交作業區上傳
+．主旨:資結程式作業_學號_名字
+．繳交的期限：2020/12/17 (23:59)
+____________________________________________________
+jdk版本: jdk-12.0.2
+資料:
+https://openhome.cc/Gossip/AlgorithmGossip/InFixPostfix.htm
+____________________________________________________
+
+//資結程式作業_108403501_劉柔辰
+//jdk版本: jdk-12.0.2
+package main;
+import java.util.*;
+
+public class Main
+{
+    public static void main(String[] args)
+    {
+    	// TODO Auto-generated method stub
+    	
+        Scanner sc = new Scanner(System.in);
+        String iInfix = "";
+
+        System.out.print("請輸入數學算式: ");
+        iInfix = sc.nextLine();
+        
+        System.out.println("中序轉後序為: " + toPostfix(iInfix));
+        sc.close();
+    }
+    
+	private static int priority(char c)
+	{
+        return c == '+' || c == '-' ? 1 : c == '*' || c == '/' ? 2 : 0;
+    }
+    
+    private static String toPostfix(String infix, boolean isPost)
+    {
+    	String expr = "";
+    	char toStack = '\0', toOutput = '\0';
+    	LinkedList<Character> stack = new LinkedList<>();
+        StringBuilder output = new StringBuilder();
+    	
+    	expr = isPost ? infix : new StringBuffer(infix).reverse().toString();
+        toStack = isPost ? '(' : ')';
+        toOutput = isPost ? ')' : '(';
+        
+        for(char c : expr.toCharArray())
+        {
+            if(c == toStack)
+            {
+            	stack.add(c);
+            }
+            
+            else if("+-*/".indexOf(c) != -1)
+            {
+                while(!stack.isEmpty() && priority(stack.getLast()) >= priority(c))
+                { 
+                    output.append(stack.removeLast());
+                }
+                
+                stack.add(c);
+            }
+            else if(c == toOutput)
+            {
+                while(stack.getLast() != toStack)
+                { 
+                    output.append(stack.removeLast());
+                }
+                
+                stack.removeLast();
+            }
+            else
+            {
+            	output.append(c);
+            }
+            
+        }
+        
+        while(!stack.isEmpty())
+        {
+        	output.append(stack.removeLast());
+        }
+        
+        return isPost ? output.toString() : output.reverse().toString();
+    }
+    
+    public static String toPostfix(String infix)
+    {
+        return toPostfix(infix, true);
+    }
+
+/*
+    public static String toPrefix(String infix)
+    {
+        return toPostfix(infix, false);
+    }
+*/
+    
+}
+
+----------------------------------------------------
+algorithm inToPostFix(val formula <string>)
+Convert infix formula to postfix.
+Pre formula is infix notation that has been edited to ensure that there are no syntactical errors
+Post postfix formula has been formatted as a string
+Return postfix formula
+
+1 createStack (stack)
+2 set postFix to null string
+3 looper = 0
+4 loop (looper < sizeof formula)
+	1 token = formula[looper]
+	2 if (token is open parenthesis)
+		1 pushStack (stack, token)
+	3 elseif (token is close parenthesis)
+		1 popStack (stack, token)
+		2 loop (token not open parenthesis)
+			1 concatenate token to postFix
+			2 popStack (stack, token)
+		3 end loop
+	4 elseif (token is operator)
+		  //Test priority of token to token at top of stack
+		1 stackTop (stack, topToken)
+		2 loop ( not emptyStack (stack)
+			AND priority(token) <= priority(topToken) )
+			1 popStack (stack, tokenOut)
+			2 concatenate tokenOut to postFix
+			3 stackTop (stack, topToken)
+		3 end loop
+		4 pushStack (stack, token)
+	5 else
+		  //Character is operand
+		1 concatenate token to postFix.
+	6 end if
+	7 looper = looper + 1
+5 end loop
+  // Input formula empty. Pop stack to postFix
+6 loop (not emptyStack (stack))
+	1 popStack (stack, token)
+	2 concatenate token to postFix
+7 end loop
+8 return postFix
+end inToPostFix
+
+----------------------------------------------------
+algorithm createStack (ref stack <metadata>)
+Initializes metadata for a stack.
+	Pre	stack is structure for metadata
+	Post	metadata initialized
+1 stack.count = 0
+2 stack.top = null
+3 return
+end createStack
+----------------------------------------------------
+algorithm pushStack (ref stack <metadata>,
+		     val data  <datatype>)
+Insert (push) one item into the stack.
+	Pre    stack is metadata structure to a valid stack
+	       data contain data to be pushed into stack
+	Post   data have been pushed in stack
+	Return true if successful; false if memory overflow
+1 if (stack full)
+	1 success = false
+2 else
+	1 allocate (newPtr)
+	2 newPtr->data = data
+	3 newPtr->next = stack.top
+	4 stack.top = newPtr
+	5 stack.count = stack.count + 1
+	6 success = true
+3 end if
+4 return success
+end pushStack
+----------------------------------------------------
+algorithm popStack (ref stack   <metadata>,
+		    ref dataOut <dataType>)
+This algorithm pops the item on the top of the stack and returns it to the user.
+	Pre    stack is metadata structure to a valid stack
+	       dataOut is a reference variable to receive the data
+	Post   Data have been returned to calling algorithm
+	Return true if successful; false if underflow
+1 if (stack empty)
+	1 success = false
+2 else
+	1 dltptr = stack.top
+	2 dataOut = stack.top->data
+	3 stack.top = stack.top->next
+	4 stack.count = stack.count - 1
+	5 recycle (dltPtr)
+	6 success = true
+3 end if
+4 return success
+end popStack
+----------------------------------------------------
+algorithm stackTop (val stack   <metadata>,
+		    ref dataOut <dataTpye>)
+This algorithm retrieves the data from the top of the stack without changing the stack.
+	Pre    stack is metadata structure to a valid stack
+	       dataOut is a reference variable to receive the data
+	Post   data have been returned to calling algorithm
+	Return true if data returned, false if underflow
+1 if (stack empty)
+	1 success = false
+2 else
+	1 dataOut = stack.top->data
+	2 success = true
+3 end if
+4 return success
+end stackTop
+----------------------------------------------------
+algorithm destroyStack (ref stack <metadata>)
+This algorithm releases all nodes back to the dynamic memory.
+	Pre  stack is metadata structure to a valid stack
+	Post stack empty and all nodes recycled
+1 loop (stack.top not null)
+	1 temp = stack.top
+	2 stack.top = stack.top->next
+	3 recycle (temp)
+2 end loop
+3 stack.count = 0;
+4 return
+end destroyStack
+----------------------------------------------------
